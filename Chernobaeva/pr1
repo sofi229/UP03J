@@ -1,0 +1,156 @@
+import java.awt.EventQueue;
+import javax.swing.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class UnitConverter {
+
+    private JFrame frame;
+    private JTextField nameField;
+    private JTextField valueField;
+    private JTextArea resultArea;
+    private JComboBox<String> typeComboBox;
+    private JComboBox<String> unitComboBox;
+
+    // Константы для единиц измерений
+    private static final String[] WEIGHT_UNITS = {"kg", "g", "t"};
+    private static final String[] LENGTH_UNITS = {"m", "cm", "km"};
+    private static final String[] TYPES = {"Weight", "Length"};
+
+    // Метод для запуска программы
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    UnitConverter window = new UnitConverter();
+                    window.frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    // Конструктор приложения
+    public UnitConverter() {
+        initialize();
+    }
+
+    // Инициализация компонентов
+    private void initialize() {
+        frame = new JFrame();
+        frame.setBounds(100, 100, 450, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
+
+        JLabel nameLabel = new JLabel("Введите ваше имя:");
+        nameLabel.setBounds(10, 10, 150, 25);
+        frame.getContentPane().add(nameLabel);
+
+        nameField = new JTextField();
+        nameField.setBounds(170, 10, 200, 25);
+        frame.getContentPane().add(nameField);
+        nameField.setColumns(10);
+
+        JLabel typeLabel = new JLabel("Select type:");
+        typeLabel.setBounds(10, 45, 150, 25);
+        frame.getContentPane().add(typeLabel);
+
+        typeComboBox = new JComboBox<>(TYPES);
+        typeComboBox.setBounds(170, 45, 200, 25);
+        typeComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateUnitComboBox();
+            }
+        });
+        frame.getContentPane().add(typeComboBox);
+
+        JLabel unitLabel = new JLabel("Select unit:");
+        unitLabel.setBounds(10, 80, 150, 25);
+        frame.getContentPane().add(unitLabel);
+
+        unitComboBox = new JComboBox<>();
+        unitComboBox.setBounds(170, 80, 200, 25);
+        frame.getContentPane().add(unitComboBox);
+
+        JLabel valueLabel = new JLabel("Enter value:");
+        valueLabel.setBounds(10, 115, 150, 25);
+        frame.getContentPane().add(valueLabel);
+
+        valueField = new JTextField();
+        valueField.setBounds(170, 115, 200, 25);
+        frame.getContentPane().add(valueField);
+        valueField.setColumns(10);
+
+        JButton resultButton = new JButton("Convert");
+        resultButton.setBounds(170, 150, 100, 25);
+        resultButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showResult();
+            }
+        });
+        frame.getContentPane().add(resultButton);
+
+        resultArea = new JTextArea();
+        resultArea.setBounds(10, 180, 400, 70);
+        frame.getContentPane().add(resultArea);
+
+        // Инициализация доступных единиц для перевода
+        updateUnitComboBox();
+    }
+
+    // Обновление ComboBox с единицами в зависимости от выбранного типа
+    private void updateUnitComboBox() {
+        String type = (String) typeComboBox.getSelectedItem();
+        if ("Weight".equals(type)) {
+            unitComboBox.setModel(new DefaultComboBoxModel<>(WEIGHT_UNITS));
+        } else if ("Length".equals(type)) {
+            unitComboBox.setModel(new DefaultComboBoxModel<>(LENGTH_UNITS));
+        }
+    }
+
+    // Метод для выполнения перевода и вывода результата
+    private void showResult() {
+        String name = nameField.getText();
+        String type = (String) typeComboBox.getSelectedItem();
+        String unit = (String) unitComboBox.getSelectedItem();
+        double value;
+        
+        try {
+            value = Double.parseDouble(valueField.getText());
+        } catch (NumberFormatException e) {
+            resultArea.setText("Invalid value!");
+            return;
+        }
+
+        StringBuilder result = new StringBuilder("Hello, " + name + "!\n");
+        
+        if ("Weight".equals(type)) {
+            result.append("You entered ").append(value).append(" ").append(unit).append("\n");
+            if ("kg".equals(unit)) {
+                result.append("In grams: ").append(value * 1000).append(" g\n");
+                result.append("In tons: ").append(value / 1000).append(" t\n");
+            } else if ("g".equals(unit)) {
+                result.append("In kilograms: ").append(value / 1000).append(" kg\n");
+                result.append("In tons: ").append(value / 1000000).append(" t\n");
+            } else if ("t".equals(unit)) {
+                result.append("In kilograms: ").append(value * 1000).append(" kg\n");
+                result.append("In grams: ").append(value * 1000000).append(" g\n");
+            }
+        } else if ("Length".equals(type)) {
+            result.append("You entered ").append(value).append(" ").append(unit).append("\n");
+            if ("m".equals(unit)) {
+                result.append("In centimeters: ").append(value * 100).append(" cm\n");
+                result.append("In kilometers: ").append(value / 1000).append(" km\n");
+            } else if ("cm".equals(unit)) {
+                result.append("In meters: ").append(value / 100).append(" m\n");
+                result.append("In kilometers: ").append(value / 100000).append(" km\n");
+            } else if ("km".equals(unit)) {
+                result.append("In meters: ").append(value * 1000).append(" m\n");
+                result.append("In centimeters: ").append(value * 100000).append(" cm\n");
+            }
+        }
+
+        resultArea.setText(result.toString());
+    }
+}
